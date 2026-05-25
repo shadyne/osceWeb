@@ -17,12 +17,16 @@
     <h5 class="card-title text-primary">Jawaban Peserta</h5>
     <?php if ($jawaban): ?>
       <div class="dokumen-kasus"><?= e($jawaban['kode_diagnosa']) ?></div>
-      <?php if (!empty($jawaban['catatan_peserta'])): ?>
-        <p class="mt-2"><strong>Catatan:</strong> <?= nl2br(e($jawaban['catatan_peserta'])) ?></p>
-      <?php endif; ?>
       <small class="text-muted">Disubmit: <?= fmt_tgl($jawaban['submitted_at'], 'd-m-Y H:i') ?></small>
     <?php else: ?>
       <em class="text-muted">Peserta belum mengumpulkan jawaban.</em>
+    <?php endif; ?>
+
+    <?php if (!empty($session['kunci_kode'])): ?>
+      <details class="mt-3">
+        <summary class="text-primary" style="cursor:pointer;">Lihat Kunci Jawaban</summary>
+        <div class="dokumen-kasus mt-2"><?= e($session['kunci_kode']) ?></div>
+      </details>
     <?php endif; ?>
   </div>
 </div>

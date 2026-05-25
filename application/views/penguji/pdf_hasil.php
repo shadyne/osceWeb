@@ -32,17 +32,14 @@
 <h5 class="mt-4">Jawaban Peserta</h5>
 <?php if ($jawaban): ?>
   <div class="dokumen-kasus"><?= e($jawaban['kode_diagnosa']) ?></div>
-  <?php if (!empty($jawaban['catatan_peserta'])): ?>
-    <p class="mt-2"><strong>Catatan:</strong> <?= nl2br(e($jawaban['catatan_peserta'])) ?></p>
-  <?php endif; ?>
   <small class="text-muted">Disubmit: <?= fmt_tgl($jawaban['submitted_at'], 'd-m-Y H:i') ?></small>
 <?php else: ?>
   <em>Peserta tidak mengumpulkan jawaban.</em>
 <?php endif; ?>
 
 <?php if (!empty($session['kunci_kode'])): ?>
-  <h5 class="mt-4">Kunci Kode (referensi)</h5>
-  <p><?= e($session['kunci_kode']) ?></p>
+  <h5 class="mt-4">Kunci Jawaban (referensi)</h5>
+  <div class="dokumen-kasus"><?= e($session['kunci_kode']) ?></div>
 <?php endif; ?>
 
 <?php if ($penilaian):

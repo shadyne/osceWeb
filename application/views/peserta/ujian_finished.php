@@ -12,9 +12,6 @@
   <div class="card-body">
     <h5 class="card-title text-primary">Jawaban Anda</h5>
     <div class="dokumen-kasus"><?= e($jawaban['kode_diagnosa']) ?></div>
-    <?php if (!empty($jawaban['catatan_peserta'])): ?>
-      <p class="mt-2"><strong>Catatan:</strong> <?= nl2br(e($jawaban['catatan_peserta'])) ?></p>
-    <?php endif; ?>
     <small class="text-muted">Disubmit: <?= fmt_tgl($jawaban['submitted_at'], 'd-m-Y H:i') ?></small>
   </div>
 </div>

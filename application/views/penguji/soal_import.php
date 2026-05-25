@@ -6,8 +6,9 @@
 <div class="card">
   <div class="card-body">
     <p>Format CSV (UTF-8) dengan header baris pertama:
-       <code>judul, kunci_kode, dokumen_kasus</code>.
-       Kolom dokumen_kasus boleh multi-baris (apit dengan tanda kutip ganda).</p>
+       <code>dokumen_kasus, kunci_kode</code>.
+       Kolom yang berisi multi-baris diapit dengan tanda kutip ganda.
+       Judul soal akan dibuat otomatis dari baris pertama dokumen kasus.</p>
 
     <form method="post" enctype="multipart/form-data" action="<?= site_url('penguji/soal_import') ?>">
       <div class="mb-3">

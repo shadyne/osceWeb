@@ -20,13 +20,9 @@
 <form method="post" action="<?= site_url('peserta/submit/'.$session['id']) ?>" class="card" id="jawabanForm">
   <div class="card-body">
     <div class="mb-3">
-      <label class="form-label">Kode Diagnosa</label>
-      <textarea name="kode_diagnosa" class="form-control" rows="6" required
-                placeholder="Tuliskan kode ICD-10 (dan ICD-9CM untuk tindakan, bila ada)."><?= e($jawaban['kode_diagnosa'] ?? '') ?></textarea>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Catatan (opsional)</label>
-      <textarea name="catatan_peserta" class="form-control" rows="3"><?= e($jawaban['catatan_peserta'] ?? '') ?></textarea>
+      <label class="form-label fw-semibold">Jawaban</label>
+      <textarea name="kode_diagnosa" class="form-control" rows="16" required><?= e($jawaban['kode_diagnosa'] ?? '') ?></textarea>
+      <div class="form-text">Jawab seluruh sub-pertanyaan dalam satu kotak ini.</div>
     </div>
     <button class="btn btn-primary" type="submit"
             onclick="return confirm('Submit jawaban? Setelah submit tidak bisa diubah.')">

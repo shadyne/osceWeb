@@ -45,11 +45,12 @@ class Penguji extends MY_Controller
     public function soal_save()
     {
         $id = $this->input->post('id');
+        $kasus = $this->input->post('dokumen_kasus');
         $data = [
             'penguji_id'    => $this->user()['id'],
-            'judul'         => trim($this->input->post('judul', true)),
-            'dokumen_kasus' => $this->input->post('dokumen_kasus'),
-            'kunci_kode'    => trim($this->input->post('kunci_kode', true)),
+            'judul'         => $this->generate_judul($kasus),
+            'dokumen_kasus' => $kasus,
+            'kunci_kode'    => trim((string) $this->input->post('kunci_kode')),
         ];
 
         if (!empty($_FILES['lampiran']['name'])) {
@@ -91,15 +92,16 @@ class Penguji extends MY_Controller
         while ($h && ($row = fgetcsv($h, 0, ',')) !== false) {
             if ($first) {
                 $first = false;
-                if (strtolower(trim($row[0] ?? '')) === 'judul') continue;
+                if (strtolower(trim($row[0] ?? '')) === 'dokumen_kasus') continue;
             }
-            if (empty($row[0])) continue;
+            $kasus = trim($row[0] ?? '');
+            if ($kasus === '') continue;
 
             $this->Soal_model->create([
                 'penguji_id'    => $this->user()['id'],
-                'judul'         => trim($row[0]),
+                'judul'         => $this->generate_judul($kasus),
+                'dokumen_kasus' => $kasus,
                 'kunci_kode'    => trim($row[1] ?? ''),
-                'dokumen_kasus' => trim($row[2] ?? ''),
             ]);
             $count++;
         }
@@ -320,6 +322,14 @@ class Penguji extends MY_Controller
             'nilai_akhir' => $penilaian ? $this->Rubrik_model->compute_nilai_akhir($penilaian) : null,
             'penguji'     => $this->User_model->find($session['penguji_id'] ?? 0),
         ]);
+    }
+
+    private function generate_judul($kasus)
+    {
+        $first = strtok(trim((string) $kasus), "\n");
+        $first = trim((string) $first);
+        if ($first === '') return 'Soal tanpa judul';
+        return mb_strlen($first) > 80 ? mb_substr($first, 0, 77) . '...' : $first;
     }
 
     private function upload_lampiran($field)

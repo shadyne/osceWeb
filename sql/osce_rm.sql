@@ -21,7 +21,7 @@ CREATE TABLE soal_osce (
   judul           VARCHAR(255) NOT NULL,
   dokumen_kasus   LONGTEXT     NOT NULL,
   lampiran        VARCHAR(255) NULL,
-  kunci_kode      VARCHAR(255) NULL,
+  kunci_kode      TEXT         NULL,
   created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (penguji_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
