@@ -1,42 +1,38 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 text-primary mb-0">Bank Soal</h1>
-  <div class="d-flex gap-2">
-    <a class="btn btn-secondary" href="<?= site_url('penguji/soal_import') ?>">
-      <i class="bi bi-upload"></i> Import CSV
-    </a>
-    <a class="btn btn-primary" href="<?= site_url('penguji/soal_form') ?>">
-      <i class="bi bi-plus-lg"></i> Soal Baru
-    </a>
-  </div>
-</div>
-
-<div class="card">
-  <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="table-light">
-        <tr><th>Judul</th><th>Kunci Kode</th><th>Dibuat</th><th></th></tr>
-      </thead>
-      <tbody>
-      <?php foreach ($soal as $s): ?>
-        <tr>
-          <td class="fw-semibold"><?= e($s['judul']) ?></td>
-          <td><?= e($s['kunci_kode'] ?? '-') ?></td>
-          <td><?= fmt_tgl($s['created_at']) ?></td>
-          <td>
-            <a class="btn btn-sm btn-outline-primary" href="<?= site_url('penguji/soal_form/'.$s['id']) ?>">
-              <i class="bi bi-pencil"></i>
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Daftar Soal</h3>
+        <div class="box-tools pull-right">
+            <a class="btn btn-default btn-sm" href="<?= site_url('penguji/soal_import') ?>">
+                <i class="fa fa-upload"></i> Import
             </a>
-            <a class="btn btn-sm btn-outline-danger" href="<?= site_url('penguji/soal_delete/'.$s['id']) ?>"
-               onclick="return confirm('Hapus soal?')">
-              <i class="bi bi-trash"></i>
+            <a class="btn btn-primary btn-sm" href="<?= site_url('penguji/soal_form') ?>">
+                <i class="fa fa-plus"></i> Soal Baru
             </a>
-          </td>
-        </tr>
-      <?php endforeach; ?>
-      <?php if (empty($soal)): ?>
-        <tr><td colspan="4" class="text-center text-muted py-4">Belum ada soal.</td></tr>
-      <?php endif; ?>
-      </tbody>
-    </table>
-  </div>
+        </div>
+    </div>
+    <div class="box-body">
+        <table class="table table-hover datatable">
+            <thead>
+                <tr><th>Judul</th><th>Kunci Kode</th><th>Dibuat</th><th width="120">Aksi</th></tr>
+            </thead>
+            <tbody>
+            <?php foreach ($soal as $s): ?>
+                <tr>
+                    <td><strong><?= e($s['judul']) ?></strong></td>
+                    <td><?= e(mb_strimwidth($s['kunci_kode'] ?? '-', 0, 60, '...')) ?></td>
+                    <td><?= fmt_tgl($s['created_at']) ?></td>
+                    <td>
+                        <a class="btn btn-xs btn-info" href="<?= site_url('penguji/soal_form/'.$s['id']) ?>">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                        <a class="btn btn-xs btn-danger" href="<?= site_url('penguji/soal_delete/'.$s['id']) ?>"
+                           onclick="return confirm('Hapus soal?')">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 </div>

@@ -18,7 +18,9 @@ class Peserta extends MY_Controller
     public function dashboard()
     {
         $this->view('peserta/dashboard', [
-            'jadwal' => $this->Jadwal_model->jadwal_for_peserta($this->user()['id']),
+            'judul'    => 'Dashboard',
+            'subjudul' => 'Ujian yang dijadwalkan untuk Anda',
+            'jadwal'   => $this->Jadwal_model->jadwal_for_peserta($this->user()['id']),
         ]);
     }
 

@@ -1,18 +1,21 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 text-primary mb-0"><?= e($session['nama_sesi']) ?></h1>
-  <a href="<?= site_url('peserta') ?>" class="btn btn-link">&larr; Dashboard</a>
-</div>
+<div class="box box-success">
+    <div class="box-header with-border">
+        <h3 class="box-title"><?= e($session['nama_sesi']) ?></h3>
+        <div class="box-tools pull-right">
+            <a class="btn btn-default btn-sm" href="<?= site_url('peserta') ?>">
+                <i class="fa fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </div>
+    <div class="box-body">
+        <div class="callout callout-success">
+            <i class="fa fa-check-circle"></i> Ujian telah selesai. Hasil akan dinilai oleh penguji.
+        </div>
 
-<div class="alert alert-success">
-  <i class="bi bi-check-circle"></i> Ujian telah selesai. Hasil akan dinilai oleh penguji.
+        <?php if ($jawaban): ?>
+            <h4>Jawaban Anda</h4>
+            <div class="dokumen-kasus"><?= e($jawaban['kode_diagnosa']) ?></div>
+            <p class="help-block">Disubmit: <?= fmt_tgl($jawaban['submitted_at'], 'd-m-Y H:i') ?></p>
+        <?php endif; ?>
+    </div>
 </div>
-
-<?php if ($jawaban): ?>
-<div class="card">
-  <div class="card-body">
-    <h5 class="card-title text-primary">Jawaban Anda</h5>
-    <div class="dokumen-kasus"><?= e($jawaban['kode_diagnosa']) ?></div>
-    <small class="text-muted">Disubmit: <?= fmt_tgl($jawaban['submitted_at'], 'd-m-Y H:i') ?></small>
-  </div>
-</div>
-<?php endif; ?>

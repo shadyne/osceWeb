@@ -32,6 +32,9 @@ class MY_Controller extends CI_Controller
             'success' => $this->session->flashdata('success'),
             'error'   => $this->session->flashdata('error'),
         ];
+        $data['judul']    = $data['judul']    ?? '';
+        $data['subjudul'] = $data['subjudul'] ?? '';
+
         $this->load->view('layout/header', $data);
         $this->load->view($view, $data);
         $this->load->view('layout/footer', $data);

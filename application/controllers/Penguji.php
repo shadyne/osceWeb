@@ -22,6 +22,8 @@ class Penguji extends MY_Controller
         $jadwal = $this->Jadwal_model->all($pid);
 
         $this->view('penguji/dashboard', [
+            'judul'        => 'Dashboard',
+            'subjudul'     => 'Ringkasan aktivitas',
             'total_soal'   => count($this->Soal_model->all($pid)),
             'total_jadwal' => count($jadwal),
             'jadwal'       => array_slice($jadwal, 0, 5),
@@ -345,6 +347,131 @@ class Penguji extends MY_Controller
         $this->User_model->delete($id);
         $this->flash_ok('Akun peserta dihapus.');
         redirect('penguji/peserta');
+    }
+
+    public function peserta_import()
+    {
+        if ($this->input->method() !== 'post') {
+            return $this->view('penguji/peserta_import', ['judul' => 'Import Peserta']);
+        }
+
+        if (empty($_FILES['file']['tmp_name'])) {
+            $this->flash_err('Pilih file terlebih dahulu.');
+            redirect('penguji/peserta_import');
+        }
+
+        $ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+        $rows = $ext === 'xlsx'
+            ? $this->read_xlsx($_FILES['file']['tmp_name'])
+            : $this->read_csv($_FILES['file']['tmp_name']);
+
+        $created = 0;
+        $skipped = 0;
+        $first = true;
+        foreach ($rows as $row) {
+            if ($first) {
+                $first = false;
+                if (strtolower(trim($row[0] ?? '')) === 'nama_lengkap') continue;
+            }
+
+            $nama     = trim($row[0] ?? '');
+            $nim      = trim($row[1] ?? '');
+            $username = trim($row[2] ?? '');
+            $password = (string) ($row[3] ?? '');
+            $email    = trim($row[4] ?? '');
+
+            if ($nama === '' || $username === '' || $password === '') {
+                $skipped++;
+                continue;
+            }
+            if ($this->User_model->username_exists($username)) {
+                $skipped++;
+                continue;
+            }
+
+            $this->User_model->create([
+                'username'     => $username,
+                'password'     => $password,
+                'nama_lengkap' => $nama,
+                'identitas'    => $nim ?: null,
+                'email'        => $email ?: null,
+                'role'         => 'peserta',
+                'is_active'    => 1,
+            ]);
+            $created++;
+        }
+
+        $this->flash_ok("Import selesai: $created peserta dibuat, $skipped dilewati.");
+        redirect('penguji/peserta');
+    }
+
+    private function read_csv($path)
+    {
+        $out = [];
+        $h = fopen($path, 'r');
+        while ($h && ($row = fgetcsv($h, 0, ',')) !== false) $out[] = $row;
+        if ($h) fclose($h);
+        return $out;
+    }
+
+    /**
+     * Baca .xlsx (zip) - ambil sheet pertama tanpa library.
+     * Mendukung shared strings & inline strings.
+     */
+    private function read_xlsx($path)
+    {
+        $zip = new ZipArchive();
+        if ($zip->open($path) !== true) return [];
+
+        $strings = [];
+        if (($ss = $zip->getFromName('xl/sharedStrings.xml')) !== false) {
+            $xml = simplexml_load_string($ss);
+            if ($xml !== false) {
+                foreach ($xml->si as $si) {
+                    $strings[] = (string) ($si->t ?? '');
+                }
+            }
+        }
+
+        $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
+        $zip->close();
+        if (!$sheet) return [];
+
+        $xml = simplexml_load_string($sheet);
+        if ($xml === false) return [];
+
+        $rows = [];
+        foreach ($xml->sheetData->row as $row) {
+            $line = [];
+            $idx  = 0;
+            foreach ($row->c as $c) {
+                $ref = (string) $c['r'];
+                $col = $this->col_to_idx(preg_replace('/\d+/', '', $ref));
+
+                while ($idx < $col) { $line[] = ''; $idx++; }
+
+                $type = (string) $c['t'];
+                if ($type === 's') {
+                    $line[] = $strings[(int) $c->v] ?? '';
+                } elseif ($type === 'inlineStr') {
+                    $line[] = (string) ($c->is->t ?? '');
+                } else {
+                    $line[] = (string) $c->v;
+                }
+                $idx++;
+            }
+            $rows[] = $line;
+        }
+        return $rows;
+    }
+
+    private function col_to_idx($letters)
+    {
+        $n = 0;
+        for ($i = 0, $len = strlen($letters); $i < $len; $i++) {
+            $n = $n * 26 + (ord($letters[$i]) - 64);
+        }
+        return $n - 1;
     }
 
     public function rubrik()

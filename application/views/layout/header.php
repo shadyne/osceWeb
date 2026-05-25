@@ -1,52 +1,85 @@
-<!doctype html>
-<html lang="id">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OSCE Rekam Medis</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
-</head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-osce shadow-sm">
-  <div class="container-fluid px-4">
-    <a class="navbar-brand fw-bold" href="<?= site_url() ?>">
-      OSCE RM <small class="opacity-75 fw-normal">Stase Koding</small>
-    </a>
-    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-      <i class="bi bi-list fs-3"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="nav">
-      <ul class="navbar-nav me-auto">
-        <?php if (!empty($user) && $user['role'] === 'penguji'): ?>
-          <li class="nav-item"><a class="nav-link" href="<?= site_url('penguji/dashboard') ?>">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="<?= site_url('penguji/soal') ?>">Soal</a></li>
-          <li class="nav-item"><a class="nav-link" href="<?= site_url('penguji/jadwal') ?>">Jadwal</a></li>
-          <li class="nav-item"><a class="nav-link" href="<?= site_url('penguji/peserta') ?>">Peserta</a></li>
-          <li class="nav-item"><a class="nav-link" href="<?= site_url('penguji/hasil') ?>">Hasil</a></li>
-          <li class="nav-item"><a class="nav-link" href="<?= site_url('penguji/rubrik') ?>">Rubrik</a></li>
-        <?php elseif (!empty($user) && $user['role'] === 'peserta'): ?>
-          <li class="nav-item"><a class="nav-link" href="<?= site_url('peserta/dashboard') ?>">Dashboard</a></li>
-        <?php endif; ?>
-      </ul>
-      <?php if (!empty($user)): ?>
-      <div class="d-flex align-items-center gap-3 text-white">
-        <span><?= htmlspecialchars($user['nama_lengkap']) ?>
-          <small class="opacity-75">(<?= $user['role'] ?>)</small></span>
-        <a class="btn btn-outline-light btn-sm" href="<?= site_url('logout') ?>">
-          <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
-      </div>
-      <?php endif; ?>
-    </div>
-  </div>
-</nav>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><?= isset($judul) ? e($judul) : 'OSCE Rekam Medis' ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-<main class="container-fluid px-4 py-4">
-  <?php if (!empty($flash['success'])): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($flash['success']) ?></div>
-  <?php endif; ?>
-  <?php if (!empty($flash['error'])): ?>
-    <div class="alert alert-danger"><?= htmlspecialchars($flash['error']) ?></div>
-  <?php endif; ?>
+    <link rel="stylesheet" href="<?= base_url('assets/bower_components/bootstrap/dist/css/bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/bower_components/font-awesome/css/font-awesome.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/bower_components/select2/css/select2.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/dist/css/AdminLTE.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/dist/css/skins/skin-purple.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/bower_components/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/bower_components/pace/pace-theme-flash.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>">
+
+    <script src="<?= base_url('assets/bower_components/jquery/jquery-3.3.1.min.js') ?>"></script>
+    <script src="<?= base_url('assets/bower_components/sweetalert2/sweetalert2.all.min.js') ?>"></script>
+
+    <script>let base_url = '<?= base_url() ?>';</script>
+</head>
+
+<body class="hold-transition skin-purple sidebar-mini">
+<div class="wrapper">
+
+    <header class="main-header">
+        <a href="<?= site_url() ?>" class="logo">
+            <span class="logo-mini"><b>O</b>SCE</span>
+            <span class="logo-lg"><b>OSCE</b> RM</span>
+        </a>
+        <nav class="navbar navbar-static-top">
+            <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button"></a>
+            <div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown user user-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-user-circle"></i>
+                            <span class="hidden-xs"><?= e($user['nama_lengkap'] ?? '') ?></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="user-header" style="background:#605ca8;">
+                                <p>
+                                    <?= e($user['nama_lengkap'] ?? '') ?>
+                                    <small><?= ucfirst($user['role'] ?? '') ?></small>
+                                </p>
+                            </li>
+                            <li class="user-footer">
+                                <div class="pull-right">
+                                    <a href="<?= site_url('logout') ?>" class="btn btn-default btn-flat">
+                                        <i class="fa fa-sign-out"></i> Logout
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <?php $this->load->view('layout/sidebar'); ?>
+
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>
+                <?= isset($judul) ? e($judul) : '' ?>
+                <?php if (!empty($subjudul)): ?><small><?= e($subjudul) ?></small><?php endif; ?>
+            </h1>
+        </section>
+
+        <section class="content container-fluid">
+            <?php if (!empty($flash['success'])): ?>
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <i class="icon fa fa-check"></i> <?= e($flash['success']) ?>
+                </div>
+            <?php endif; ?>
+            <?php if (!empty($flash['error'])): ?>
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <i class="icon fa fa-ban"></i> <?= e($flash['error']) ?>
+                </div>
+            <?php endif; ?>

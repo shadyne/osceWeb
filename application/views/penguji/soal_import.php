@@ -1,27 +1,29 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 text-primary mb-0">Import Soal</h1>
-  <a href="<?= site_url('penguji/soal') ?>" class="btn btn-link">&larr; Kembali</a>
-</div>
-
-<div class="card">
-  <div class="card-body">
-    <p>Format yang didukung:</p>
-    <ul>
-      <li><strong>.docx</strong> &mdash; 1 file = 1 soal. Seluruh teks dokumen dipakai sebagai dokumen kasus.</li>
-      <li><strong>.txt</strong> &mdash; 1 file = 1 soal (teks polos).</li>
-      <li><strong>.csv</strong> &mdash; banyak soal sekaligus. Header: <code>dokumen_kasus, kunci_kode</code>.
-          Kolom multi-baris diapit tanda kutip ganda.</li>
-    </ul>
-    <p class="text-muted small">Judul soal dibuat otomatis dari baris pertama dokumen kasus.</p>
-
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Import Soal</h3>
+        <div class="box-tools pull-right">
+            <a class="btn btn-default btn-sm" href="<?= site_url('penguji/soal') ?>">
+                <i class="fa fa-arrow-left"></i> Kembali
+            </a>
+        </div>
+    </div>
     <form method="post" enctype="multipart/form-data" action="<?= site_url('penguji/soal_import') ?>">
-      <div class="mb-3">
-        <label class="form-label">File</label>
-        <input type="file" name="file" accept=".docx,.txt,.csv" class="form-control" required>
-      </div>
-      <button class="btn btn-primary" type="submit">
-        <i class="bi bi-upload"></i> Import
-      </button>
+        <div class="box-body">
+            <p>Format yang didukung:</p>
+            <ul>
+                <li><strong>.docx</strong> &mdash; 1 file = 1 soal. Seluruh teks dipakai sebagai dokumen kasus.</li>
+                <li><strong>.txt</strong> &mdash; 1 file = 1 soal (teks polos).</li>
+                <li><strong>.csv</strong> &mdash; banyak soal sekaligus. Header: <code>dokumen_kasus, kunci_kode</code>.</li>
+            </ul>
+            <p class="text-muted">Judul soal dibuat otomatis dari baris pertama dokumen kasus.</p>
+
+            <div class="form-group">
+                <label>File</label>
+                <input type="file" name="file" accept=".docx,.txt,.csv" class="form-control" required>
+            </div>
+        </div>
+        <div class="box-footer">
+            <button class="btn btn-primary" type="submit"><i class="fa fa-upload"></i> Import</button>
+        </div>
     </form>
-  </div>
 </div>
