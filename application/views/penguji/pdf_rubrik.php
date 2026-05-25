@@ -12,7 +12,8 @@
   <button class="btn btn-primary" onclick="window.print()">
     <i class="bi bi-printer"></i> Cetak / Simpan PDF
   </button>
-  <a class="btn btn-outline-secondary" href="javascript:history.back()">Kembali</a>
+  <a class="btn btn-outline-secondary" href="<?= site_url('penguji/hasil/'.$session['jadwal_id']) ?>">Kembali</a>
+  <button class="btn btn-outline-secondary" type="button" onclick="window.close()">Tutup Tab</button>
 </div>
 
 <h2 class="text-primary mb-0">RUBRIK PENILAIAN &mdash; STATION KODIFIKASI KLINIS</h2>

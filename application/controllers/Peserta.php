@@ -28,9 +28,12 @@ class Peserta extends MY_Controller
         $session = $this->Jadwal_model->find_peserta_session($jp_id, $this->user()['id']);
         if (!$session) show_404();
 
-        $now   = time();
-        $start = strtotime($session['waktu_mulai']);
-        $end   = strtotime($session['waktu_selesai']);
+        if ($session['status'] === 'selesai') {
+            return $this->view('peserta/ujian_finished', [
+                'session' => $session,
+                'jawaban' => $this->Jawaban_model->find_by_jp($jp_id),
+            ]);
+        }
 
         if ($session['jadwal_status'] !== 'aktif') {
             return $this->view('peserta/ujian_unavailable', [
@@ -39,6 +42,18 @@ class Peserta extends MY_Controller
             ]);
         }
 
+        $start = !empty($session['waktu_mulai'])   ? strtotime($session['waktu_mulai'])   : null;
+        $end   = !empty($session['waktu_selesai']) ? strtotime($session['waktu_selesai']) : null;
+
+        if (!$start || !$end) {
+            return $this->view('peserta/ujian_unavailable', [
+                'session' => $session,
+                'message' => 'Jadwal belum lengkap (waktu mulai/selesai kosong). Hubungi penguji.',
+            ]);
+        }
+
+        $now = time();
+
         if ($now < $start) {
             return $this->view('peserta/ujian_unavailable', [
                 'session' => $session,
@@ -46,10 +61,11 @@ class Peserta extends MY_Controller
             ]);
         }
 
-        if ($now > $end || $session['status'] === 'selesai') {
-            return $this->view('peserta/ujian_finished', [
+        if ($now > $end) {
+            return $this->view('peserta/ujian_unavailable', [
                 'session' => $session,
-                'jawaban' => $this->Jawaban_model->find_by_jp($jp_id),
+                'message' => 'Ujian telah berakhir pada ' . date('d-m-Y H:i', $end)
+                           . '. Anda tidak sempat menyelesaikan jawaban.',
             ]);
         }
 

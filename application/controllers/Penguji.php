@@ -82,12 +82,30 @@ class Penguji extends MY_Controller
         }
 
         if (empty($_FILES['file']['tmp_name'])) {
-            $this->flash_err('Pilih file CSV terlebih dahulu.');
+            $this->flash_err('Pilih file terlebih dahulu.');
             redirect('penguji/soal_import');
         }
 
+        $tmp = $_FILES['file']['tmp_name'];
+        $ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+
+        switch ($ext) {
+            case 'docx': $count = $this->import_docx($tmp); break;
+            case 'txt':  $count = $this->import_txt($tmp);  break;
+            case 'csv':  $count = $this->import_csv($tmp);  break;
+            default:
+                $this->flash_err('Format tidak didukung. Gunakan .docx, .txt, atau .csv.');
+                redirect('penguji/soal_import');
+        }
+
+        $this->flash_ok("$count soal berhasil diimport.");
+        redirect('penguji/soal');
+    }
+
+    private function import_csv($path)
+    {
         $count = 0;
-        $h = fopen($_FILES['file']['tmp_name'], 'r');
+        $h = fopen($path, 'r');
         $first = true;
         while ($h && ($row = fgetcsv($h, 0, ',')) !== false) {
             if ($first) {
@@ -96,19 +114,56 @@ class Penguji extends MY_Controller
             }
             $kasus = trim($row[0] ?? '');
             if ($kasus === '') continue;
-
-            $this->Soal_model->create([
-                'penguji_id'    => $this->user()['id'],
-                'judul'         => $this->generate_judul($kasus),
-                'dokumen_kasus' => $kasus,
-                'kunci_kode'    => trim($row[1] ?? ''),
-            ]);
+            $this->insert_soal($kasus, trim($row[1] ?? ''));
             $count++;
         }
         if ($h) fclose($h);
+        return $count;
+    }
 
-        $this->flash_ok("$count soal berhasil diimport.");
-        redirect('penguji/soal');
+    private function import_txt($path)
+    {
+        $text = (string) file_get_contents($path);
+        $text = trim($text);
+        if ($text === '') return 0;
+        $this->insert_soal($text, '');
+        return 1;
+    }
+
+    /**
+     * Baca .docx (zip) tanpa library — ambil teks dari word/document.xml.
+     * Tag <w:p> dianggap baris baru, <w:tab> jadi tab.
+     */
+    private function import_docx($path)
+    {
+        $zip = new ZipArchive();
+        if ($zip->open($path) !== true) return 0;
+
+        $xml = $zip->getFromName('word/document.xml');
+        $zip->close();
+        if (!$xml) return 0;
+
+        $xml = preg_replace('#<w:p\b[^>]*/>#', "\n", $xml);
+        $xml = preg_replace('#</w:p>#', "\n", $xml);
+        $xml = preg_replace('#<w:tab\b[^/]*/>#', "\t", $xml);
+        $xml = preg_replace('#<w:br\b[^/]*/>#', "\n", $xml);
+        $text = strip_tags($xml);
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_XML1, 'UTF-8');
+        $text = trim(preg_replace("/\n{3,}/", "\n\n", $text));
+
+        if ($text === '') return 0;
+        $this->insert_soal($text, '');
+        return 1;
+    }
+
+    private function insert_soal($kasus, $kunci)
+    {
+        $this->Soal_model->create([
+            'penguji_id'    => $this->user()['id'],
+            'judul'         => $this->generate_judul($kasus),
+            'dokumen_kasus' => $kasus,
+            'kunci_kode'    => $kunci,
+        ]);
     }
 
     public function jadwal()
@@ -133,14 +188,26 @@ class Penguji extends MY_Controller
 
     public function jadwal_save()
     {
-        $id = $this->input->post('id');
+        $id    = $this->input->post('id');
+        $mulai = $this->input->post('waktu_mulai');
+        $akhir = $this->input->post('waktu_selesai');
+
+        if (!$mulai || !$akhir) {
+            $this->flash_err('Waktu mulai dan waktu selesai wajib diisi.');
+            redirect($id ? 'penguji/jadwal_form/' . $id : 'penguji/jadwal_form');
+        }
+        if (strtotime($akhir) <= strtotime($mulai)) {
+            $this->flash_err('Waktu selesai harus setelah waktu mulai.');
+            redirect($id ? 'penguji/jadwal_form/' . $id : 'penguji/jadwal_form');
+        }
+
         $data = [
             'nama_sesi'     => trim($this->input->post('nama_sesi', true)),
             'soal_id'       => (int) $this->input->post('soal_id'),
             'penguji_id'    => $this->user()['id'],
             'tanggal'       => $this->input->post('tanggal'),
-            'waktu_mulai'   => $this->input->post('waktu_mulai'),
-            'waktu_selesai' => $this->input->post('waktu_selesai'),
+            'waktu_mulai'   => str_replace('T', ' ', $mulai) . ':00',
+            'waktu_selesai' => str_replace('T', ' ', $akhir) . ':00',
             'durasi_menit'  => (int) $this->input->post('durasi_menit') ?: 60,
             'status'        => $this->input->post('status') ?: 'draft',
         ];
