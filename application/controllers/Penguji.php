@@ -474,6 +474,80 @@ class Penguji extends MY_Controller
         return $n - 1;
     }
 
+    public function users()
+    {
+        $this->view('penguji/users_index', [
+            'judul'    => 'Manajemen Pengguna',
+            'subjudul' => 'Daftar penguji dan peserta',
+            'users'    => $this->User_model->all(),
+        ]);
+    }
+
+    public function users_form($id = null)
+    {
+        $this->view('penguji/users_form', [
+            'judul' => $id ? 'Edit Pengguna' : 'Tambah Pengguna',
+            'u'     => $id ? $this->User_model->find($id) : null,
+        ]);
+    }
+
+    public function users_save()
+    {
+        $id       = $this->input->post('id');
+        $username = trim($this->input->post('username', true));
+        $password = (string) $this->input->post('password');
+
+        if ($this->User_model->username_exists($username, $id ?: null)) {
+            $this->flash_err("Username '$username' sudah dipakai.");
+            redirect($id ? 'penguji/users_form/' . $id : 'penguji/users_form');
+        }
+
+        $role = $this->input->post('role');
+        if (!in_array($role, ['penguji', 'peserta'], true)) $role = 'peserta';
+
+        $data = [
+            'username'     => $username,
+            'nama_lengkap' => trim($this->input->post('nama_lengkap', true)),
+            'email'        => trim($this->input->post('email', true)) ?: null,
+            'identitas'    => trim($this->input->post('identitas', true)) ?: null,
+            'role'         => $role,
+            'is_active'    => $this->input->post('is_active') ? 1 : 0,
+        ];
+        if ($password !== '') $data['password'] = $password;
+
+        if ($id) {
+            $this->User_model->update($id, $data);
+            $this->flash_ok('Pengguna diperbarui.');
+        } else {
+            if ($password === '') {
+                $this->flash_err('Password wajib diisi untuk akun baru.');
+                redirect('penguji/users_form');
+            }
+            $this->User_model->create($data);
+            $this->flash_ok('Pengguna ditambahkan.');
+        }
+        redirect('penguji/users');
+    }
+
+    public function users_delete($id)
+    {
+        if ((int) $id === (int) $this->user()['id']) {
+            $this->flash_err('Tidak bisa menghapus akun Anda sendiri.');
+            redirect('penguji/users');
+        }
+        $this->User_model->delete($id);
+        $this->flash_ok('Pengguna dihapus.');
+        redirect('penguji/users');
+    }
+
+    public function profile()
+    {
+        $this->view('penguji/profile', [
+            'judul'    => 'Profile',
+            'subjudul' => 'Tentang aplikasi dan tim pengembang',
+        ]);
+    }
+
     public function rubrik()
     {
         $this->view('penguji/rubrik_index', [

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login &mdash; OSCE Rekam Medis</title>
+    <title>Login &mdash; OS3CODE</title>
 
     <link rel="stylesheet" href="<?= base_url('assets/bower_components/bootstrap/dist/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/bower_components/font-awesome/css/font-awesome.min.css') ?>">
@@ -203,9 +203,9 @@
              class="login-logo-center" alt="Logo OSCE">
 
         <div class="main-title">
-            <b>C</b>omputer <b>B</b>ased <b>T</b>est
+            <b>OS3</b>CODE
         </div>
-        <div class="subtitle">Sistem Penilaian OSCE Stase 3</div>
+        <div class="subtitle">Sistem Penilaian OSCE Stase 3 Koding</div>
 
         <?php if ($err = $this->session->flashdata('error')): ?>
             <div class="callout-danger text-center"><?= e($err) ?></div>

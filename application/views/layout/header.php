@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?= isset($judul) ? e($judul) : 'OSCE Rekam Medis' ?></title>
+    <title><?= isset($judul) ? e($judul) . ' &middot; OS3CODE' : 'OS3CODE' ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
     <link rel="stylesheet" href="<?= base_url('assets/bower_components/bootstrap/dist/css/bootstrap.min.css') ?>">
@@ -27,8 +27,8 @@
 
     <header class="main-header">
         <a href="<?= site_url() ?>" class="logo">
-            <span class="logo-mini"><b>O</b>SCE</span>
-            <span class="logo-lg"><b>OSCE</b> RM</span>
+            <span class="logo-mini"><b>OS3</b></span>
+            <span class="logo-lg"><b>OS3</b>CODE</span>
         </a>
         <nav class="navbar navbar-static-top">
             <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button"></a>

@@ -20,6 +20,14 @@ class User_model extends CI_Model
                         ->result_array();
     }
 
+    public function all()
+    {
+        return $this->db->order_by('role')
+                        ->order_by('nama_lengkap')
+                        ->get('users')
+                        ->result_array();
+    }
+
     public function create($data)
     {
         if (!empty($data['password'])) {
